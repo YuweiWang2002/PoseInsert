@@ -49,8 +49,37 @@ def test_dataset_windows_and_normalizer():
         assert normalized["action"].shape == (2, 16, 16)
 
 
+def test_dataset_relative_action_key_and_old_action_key():
+    with TemporaryDirectory() as tmpdir:
+        path = Path(tmpdir) / "episode0.npz"
+        rel_obs = np.arange(30 * 29, dtype=np.float32).reshape(30, 29)
+        rel_action = np.arange(30 * 20, dtype=np.float32).reshape(30, 20)
+        action_ee = np.arange(30 * 16, dtype=np.float32).reshape(30, 16)
+        np.savez(path, rel_obs=rel_obs, rel_action=rel_action, action_ee=action_ee)
+
+        rel_dataset = BiRelPoseNpzDataset(
+            tmpdir,
+            n_obs_steps=2,
+            horizon=16,
+            obs_key="rel_obs",
+            action_key="rel_action",
+            action_dim=20,
+        )
+        rel_sample = rel_dataset[0]
+        assert rel_sample["obs"].shape == (2, 29)
+        assert rel_sample["action"].shape == (16, 20)
+        normalizer = compute_normalizer(rel_dataset)
+        assert normalizer["obs_mean"].shape == (29,)
+        assert normalizer["action_mean"].shape == (20,)
+
+        old_dataset = BiRelPoseNpzDataset(tmpdir, n_obs_steps=2, horizon=16)
+        old_sample = old_dataset[0]
+        assert old_sample["action"].shape == (16, 16)
+
+
 def main():
     test_dataset_windows_and_normalizer()
+    test_dataset_relative_action_key_and_old_action_key()
     print("test_dataset: all tests passed")
 
 

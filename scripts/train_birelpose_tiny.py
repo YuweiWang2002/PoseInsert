@@ -68,6 +68,8 @@ def main():
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--seed", type=int, default=233)
+    parser.add_argument("--obs_key", default="rel_obs")
+    parser.add_argument("--action_key", default="action_ee")
     parser.add_argument("--obs_dim", type=int, default=29)
     parser.add_argument("--action_dim", type=int, default=16)
     parser.add_argument("--model_type", choices=["diffusion", "mlp"], default="diffusion")
@@ -90,6 +92,8 @@ def main():
         args.data_dir,
         n_obs_steps=args.n_obs_steps,
         horizon=args.horizon,
+        obs_key=args.obs_key,
+        action_key=args.action_key,
         obs_dim=args.obs_dim,
         action_dim=args.action_dim,
     )
@@ -109,6 +113,8 @@ def main():
     print(f"num_samples: {len(dataset)}")
     print(f"obs_dim: {args.obs_dim}")
     print(f"action_dim: {args.action_dim}")
+    print(f"obs_key: {args.obs_key}")
+    print(f"action_key: {args.action_key}")
     print(f"horizon: {args.horizon}")
     print(f"n_obs_steps: {args.n_obs_steps}")
     print(f"model_type: {args.model_type}")
